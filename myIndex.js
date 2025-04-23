@@ -1,14 +1,8 @@
 var express = require('express');
 var cors = require('cors');
-const bodyParser = require('body-parser');
-const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
-require('dotenv').config();
-
+require('dotenv').config()
+var multer = require('multer');
 var app = express();
-
-// parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(cors());
 app.use('/public', express.static(process.cwd() + '/public'));
@@ -17,8 +11,12 @@ app.get('/', function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-app.post('/api/fileanalyse', upload.single('upfile'), function(req, res) {
-  res.send({
+const upload = multer({ dest: 'uploads/' }); 
+
+app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
+  if (!req.file) return res.json({ error: "No file found" });
+
+  res.json({
     name: req.file.originalname,
     type: req.file.mimetype,
     size: req.file.size
